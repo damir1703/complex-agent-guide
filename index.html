@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="uz" data-lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Complex Ads Agent — qo'llanma · руководство</title>
+<meta name="description" content="Complex Group jamoasi uchun workbook: Telegram-bot, dashboard, AI-targetolog bilan ishlash.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECEEFA;--grad:linear-gradient(135deg,#E4DEFB 0%,#DCE6FC 42%,#EEE9FB 70%,#F8E3EA 100%);
+  --surface:#fff;--surface-2:#F5F6FB;--border:#ECEDF5;--t1:#16161D;--t2:#5B5E70;--t3:#9A9DB0;
+  --ink:#16161D;--ink-t:#fff;--acc:#F26B1D;--acc-2:#FF9A5C;--lav:#8B7CF6;--blue:#60A5FA;--mint:#34D399;
+  --ok:#0FA968;--bad:#E5484D;--warn:#E5920B;--sh:0 2px 14px rgba(40,40,80,.06);--sh-lg:0 18px 50px rgba(40,40,80,.12);
+  --r:24px;--ease:cubic-bezier(.16,1,.3,1);--f:'Outfit',ui-sans-serif,system-ui,sans-serif;--m:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#13121C;--grad:linear-gradient(135deg,#1D1934 0%,#151D33 45%,#181728 70%,#2A1926 100%);
+  --surface:#1D1C29;--surface-2:#252435;--border:#2C2B3D;--t1:#F3F2FA;--t2:#ABABC2;--t3:#74748C;--ink:#F3F2FA;--ink-t:#16161D;
+  --acc:#FF7A2E;--sh:0 2px 14px rgba(0,0,0,.35);--sh-lg:0 18px 50px rgba(0,0,0,.5)}}
+:root[data-theme=dark]{--bg:#13121C;--grad:linear-gradient(135deg,#1D1934 0%,#151D33 45%,#181728 70%,#2A1926 100%);
+  --surface:#1D1C29;--surface-2:#252435;--border:#2C2B3D;--t1:#F3F2FA;--t2:#ABABC2;--t3:#74748C;--ink:#F3F2FA;--ink-t:#16161D;
+  --acc:#FF7A2E;--sh:0 2px 14px rgba(0,0,0,.35);--sh-lg:0 18px 50px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;font:400 17px/1.6 var(--f);color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background:var(--grad);z-index:-2}
+html[data-lang=uz] .ru,html[data-lang=ru] .uz{display:none!important}
+a{color:var(--acc)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+/* верхняя панель */
+.top{position:sticky;top:0;z-index:50;padding:12px 0;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent)}
+.top .wrap{display:flex;align-items:center;gap:10px}
+.logo{display:inline-flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--surface);box-shadow:var(--sh);font-weight:600;font-size:15px;white-space:nowrap}
+.logo i{width:28px;height:28px;border-radius:99px;background:var(--acc);color:#fff;display:grid;place-items:center;font-style:normal;font-weight:700}
+.progress{position:absolute;left:0;bottom:-1px;height:2px;background:var(--acc);width:0;transition:width .15s linear}
+.pill{display:inline-flex;padding:4px;border-radius:999px;background:var(--surface);box-shadow:var(--sh)}
+.pill button{border:0;background:transparent;font:600 13px var(--f);padding:7px 13px;border-radius:999px;color:var(--t2);cursor:pointer}
+.pill button.on{background:var(--ink);color:var(--ink-t)}
+.sp{flex:1}
+.toc-btn{display:none}
+/* герой */
+.hero{padding:56px 0 30px}
+.eyebrow{font:600 12px var(--f);letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+h1{font-size:clamp(36px,6vw,64px);line-height:1.02;letter-spacing:-.045em;font-weight:600;margin:14px 0 16px}
+.lead{font-size:clamp(17px,2vw,20px);color:var(--t2);max-width:720px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
+.hero-phones{position:relative;height:520px}
+.phone{position:absolute;width:236px;border-radius:34px;padding:8px;background:var(--ink);box-shadow:var(--sh-lg)}
+.phone img{display:block;width:100%;border-radius:27px}
+.phone.a{left:6%;top:0;transform:rotate(-6deg)}.phone.b{right:4%;top:46px;transform:rotate(5deg)}
+@media(max-width:860px){.hero-phones{height:430px}.phone{width:190px}}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.stat{background:var(--surface);border-radius:18px;padding:12px 16px;box-shadow:var(--sh)}
+.stat b{display:block;font-size:24px;letter-spacing:-.03em;font-weight:600}
+.stat span{font-size:12.5px;color:var(--t3)}
+/* оглавление */
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:8px 0 10px}
+.toc a{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--t1);background:var(--surface);border-radius:18px;padding:12px 14px;box-shadow:var(--sh);transition:transform .3s var(--ease),box-shadow .3s}
+.toc a:hover{transform:translateY(-4px);box-shadow:var(--sh-lg)}
+.toc a b{font:600 12px var(--m);color:var(--acc);min-width:26px}
+.toc a span{font-size:14.5px;line-height:1.25}
+/* главы */
+section.ch{padding:64px 0 10px}
+.ch-h{display:flex;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.ch-n{font:600 13px var(--m);color:var(--ink-t);background:var(--ink);border-radius:999px;padding:6px 12px}
+h2{font-size:clamp(28px,4vw,42px);letter-spacing:-.035em;line-height:1.08;font-weight:600;margin:0}
+h3{font-size:20px;letter-spacing:-.02em;font-weight:600;margin:0 0 6px}
+p{margin:0 0 12px}
+.sub{color:var(--t2);max-width:760px;margin-top:8px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:860px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--surface);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);transition:transform .35s var(--ease),box-shadow .35s}
+.card.hov:hover{transform:translateY(-5px);box-shadow:var(--sh-lg)}
+.card .ic{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:21px;margin-bottom:12px;background:var(--surface-2)}
+.card p,.card li{color:var(--t2);font-size:15.5px}
+.card ul{margin:6px 0 0;padding-left:18px}.card li{margin:4px 0}
+.tone-l{background:linear-gradient(135deg,color-mix(in srgb,var(--lav) 16%,var(--surface)),var(--surface))}
+.tone-b{background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 16%,var(--surface)),var(--surface))}
+.tone-m{background:linear-gradient(135deg,color-mix(in srgb,var(--mint) 16%,var(--surface)),var(--surface))}
+.tone-p{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 14%,var(--surface)),var(--surface))}
+.ember{background:linear-gradient(150deg,#FF9A5C,#F26B1D 55%,#E2560C);color:#fff}
+.ember p,.ember li{color:rgba(255,255,255,.9)}
+.dark{background:var(--ink);color:var(--ink-t)}
+.dark p,.dark li{color:color-mix(in srgb,var(--ink-t) 75%,transparent)}
+/* шаги */
+.steps{counter-reset:s;display:grid;gap:12px}
+.step{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;background:var(--surface);border-radius:20px;padding:16px 18px;box-shadow:var(--sh)}
+.step::before{counter-increment:s;content:counter(s);width:42px;height:42px;border-radius:14px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:18px}
+.step p{color:var(--t2);font-size:15.5px;margin:4px 0 0}
+/* телефоны со скриншотами */
+.shot{display:grid;grid-template-columns:260px 1fr;gap:28px;align-items:center;margin:18px 0}
+.shot.rev{grid-template-columns:1fr 260px}.shot.rev .ph{order:2}
+@media(max-width:760px){.shot,.shot.rev{grid-template-columns:1fr}.shot.rev .ph{order:0}.shot .ph{max-width:250px;margin:0 auto}}
+.ph{border-radius:32px;padding:7px;background:var(--ink);box-shadow:var(--sh-lg)}
+.ph img{display:block;width:100%;border-radius:26px}
+.wide img{display:block;width:100%;border-radius:22px;box-shadow:var(--sh-lg)}
+/* Telegram-пузыри */
+.tg{background:linear-gradient(160deg,#9CC4E4,#C9DCB7);border-radius:var(--r);padding:18px;display:grid;gap:10px}
+[data-theme=dark] .tg{background:linear-gradient(160deg,#1F3A52,#24352A)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .tg{background:linear-gradient(160deg,#1F3A52,#24352A)}}
+.b{max-width:88%;padding:10px 13px;border-radius:16px;font-size:14.5px;line-height:1.45;box-shadow:0 1px 1px rgba(0,0,0,.08);white-space:pre-line}
+.b.in{background:#fff;color:#16161D;border-bottom-left-radius:6px}
+.b.out{background:#EEFFDE;color:#16161D;justify-self:end;border-bottom-right-radius:6px}
+.b .kb{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.b .kb span{flex:1;min-width:120px;text-align:center;padding:7px 10px;border-radius:10px;background:rgba(51,144,236,.12);color:#2B7BD1;font-weight:600;font-size:13.5px}
+.b small{display:block;color:#8a8a8a;font-size:11px;text-align:right;margin-top:4px}
+/* таблицы */
+.tbl{width:100%;border-collapse:separate;border-spacing:0 8px}
+.tbl td{background:var(--surface);padding:12px 14px;font-size:15px;vertical-align:top;color:var(--t2)}
+.tbl td:first-child{border-radius:16px 0 0 16px;color:var(--t1);font-weight:600;white-space:nowrap;font-family:var(--m);font-size:14px}
+.tbl td:last-child{border-radius:0 16px 16px 0}
+@media(max-width:600px){.tbl td:first-child{white-space:normal}}
+/* заметки */
+.note{border-radius:20px;padding:16px 18px;margin:14px 0;display:grid;grid-template-columns:30px 1fr;gap:10px;font-size:15.5px}
+.note.warn{background:color-mix(in srgb,var(--acc) 12%,var(--surface))}
+.note.info{background:color-mix(in srgb,var(--lav) 13%,var(--surface))}
+.note.ok{background:color-mix(in srgb,var(--mint) 15%,var(--surface))}
+/* вопросы-чипы */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:999px;background:var(--surface);box-shadow:var(--sh);font-size:14.5px;cursor:pointer;transition:transform .25s var(--ease);border:0;font-family:var(--f);color:var(--t1)}
+.chip:hover{transform:translateY(-3px)}
+.chip.copied{background:var(--ok);color:#fff}
+/* задания */
+.task{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--sh);margin:8px 0;cursor:pointer}
+.task input{width:22px;height:22px;accent-color:var(--acc);margin:2px 0 0;cursor:pointer}
+.task.done span{text-decoration:line-through;color:var(--t3)}
+.meter{height:10px;border-radius:9px;background:var(--surface-2);overflow:hidden;margin:10px 0 4px}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc-2),var(--acc));transition:width .6s var(--ease)}
+/* бюджет-пример */
+.chat-ex{display:grid;gap:10px}
+.kpi{font-size:34px;letter-spacing:-.04em;font-weight:600}
+/* появление */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+footer{padding:60px 0 80px;color:var(--t3);font-size:14px;text-align:center}
+.tag{display:inline-block;font:600 11px var(--f);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--t2)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <span class="logo"><i>C</i>Complex Ads Agent</span>
+    <span class="sp"></span>
+    <span class="pill" id="lang"><button data-l="uz" class="on">UZ</button><button data-l="ru">RU</button></span>
+    <span class="pill" id="theme"><button data-t="light" title="Light">☀︎</button><button data-t="dark" title="Dark">☾</button></span>
+  </div>
+  <div class="progress" id="prog"></div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ ГЕРОЙ ============ -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="rv">
+      <div class="eyebrow"><span class="uz">Jamoa uchun workbook</span><span class="ru">Workbook для команды</span></div>
+      <h1><span class="uz">Reklamani AI-targetolog bilan boshqarish</span><span class="ru">Как управлять рекламой вместе с AI-таргетологом</span></h1>
+      <p class="lead"><span class="uz">Complex Group reklamasi endi o'zi ishlaydigan tizim: Telegram-bot, dashboard va kabinetni hamda mijoz briefini biladigan AI-targetolog. Bu qo'llanma — 20 daqiqada uni to'liq ishlatishni o'rganish uchun. Har bo'lim oxirida amaliy topshiriq bor.</span><span class="ru">Реклама Complex Group теперь — система, которая работает сама: Telegram-бот, дашборд и AI-таргетолог, который знает кабинет и бриф компании. Это руководство — чтобы за 20 минут научиться пользоваться ей полностью. В конце каждой главы — практическое задание.</span></p>
+      <div class="stats">
+        <div class="stat"><b>$15</b><span class="uz">kunlik byudjet</span><span class="ru">бюджет в день</span></div>
+        <div class="stat"><b>24/7</b><span class="uz">kabinet nazorati</span><span class="ru">контроль кабинета</span></div>
+        <div class="stat"><b>2 min</b><span class="uz">lid botga keladi</span><span class="ru">заявка приходит в бот</span></div>
+        <div class="stat"><b>30 min</b><span class="uz">to'lov va avtostop tekshiruvi</span><span class="ru">проверка оплаты и автостоп</span></div>
+      </div>
+    </div>
+    <div class="hero-phones rv">
+      <div class="phone a"><img src="img/m-top.png" alt="Dashboard"></div>
+      <div class="phone b"><img src="img/m-chat.png" alt="AI chat"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ОГЛАВЛЕНИЕ ============ -->
+<nav class="toc rv" aria-label="toc">
+  <a href="#c1"><b>01</b><span class="uz">Tizim nimadan iborat</span><span class="ru">Из чего состоит система</span></a>
+  <a href="#c2"><b>02</b><span class="uz">5 daqiqada boshlash</span><span class="ru">Старт за 5 минут</span></a>
+  <a href="#c3"><b>03</b><span class="uz">Telegram-bot</span><span class="ru">Telegram-бот</span></a>
+  <a href="#c4"><b>04</b><span class="uz">Dashboard: Hisobot</span><span class="ru">Дашборд: Отчёт</span></a>
+  <a href="#c5"><b>05</b><span class="uz">Kreativlar bazasi</span><span class="ru">База креативов</span></a>
+  <a href="#c6"><b>06</b><span class="uz">AI-targetolog bilan chat</span><span class="ru">Чат с AI-таргетологом</span></a>
+  <a href="#c7"><b>07</b><span class="uz">Chegaralar va xavfsizlik</span><span class="ru">Границы и безопасность</span></a>
+  <a href="#c8"><b>08</b><span class="uz">Kritik vaziyatlar</span><span class="ru">Критические ситуации</span></a>
+  <a href="#c9"><b>09</b><span class="uz">Kundalik tartib</span><span class="ru">Распорядок работы</span></a>
+  <a href="#c10"><b>10</b><span class="uz">Amaliyot va «tayyorman»</span><span class="ru">Практика и «я готов»</span></a>
+</nav>
+
+<!-- ============ 01 ============ -->
+<section class="ch" id="c1">
+  <div class="ch-h rv"><span class="ch-n">01</span><h2><span class="uz">Tizim nimadan iborat</span><span class="ru">Из чего состоит система</span></h2></div>
+  <p class="sub rv"><span class="uz">To'rt qism — har biri o'z vazifasini bajaradi. Hammasi serverda 24/7 ishlaydi: hech kimning kompyuteri yoqiq turishi shart emas.</span><span class="ru">Четыре части — у каждой своя задача. Всё работает на сервере 24/7: ничей компьютер не должен быть включён.</span></p>
+  <div class="grid g4" style="margin-top:18px">
+    <div class="card hov tone-p rv"><div class="ic">🤖</div><h3><span class="uz">Telegram-bot</span><span class="ru">Telegram-бот</span></h3>
+      <p><span class="uz">@complexadsagent_bot. Yangi lidlar, ertalabki hisobot, ogohlantirishlar o'zi keladi. Buyruqlar bilan kabinet holatini ko'rasiz.</span><span class="ru">@complexadsagent_bot. Сам присылает новые заявки, утренний отчёт и тревоги. Командами смотрите состояние кабинета.</span></p></div>
+    <div class="card hov tone-l rv"><div class="ic">📊</div><h3><span class="uz">Dashboard (Mini App)</span><span class="ru">Дашборд (Mini App)</span></h3>
+      <p><span class="uz">Botdagi «📊» tugmasi. Reklama, lidlar, uchrashuvlar va shartnomalar — bitta ekranda, Facebook va Bitrix24 dan jonli.</span><span class="ru">Кнопка «📊» в боте. Реклама, заявки, встречи и договоры — на одном экране, вживую из Facebook и Bitrix24.</span></p></div>
+    <div class="card hov tone-b rv"><div class="ic">🧠</div><h3><span class="uz">AI-targetolog</span><span class="ru">AI-таргетолог</span></h3>
+      <p><span class="uz">Dashboard ichidagi «Chat». Meta Ads bilimlar bazasi, kompaniya briefi va kabinet raqamlarini biladi. Savolga javob beradi, harakat taklif qiladi.</span><span class="ru">Вкладка «Chat» в дашборде. Знает базу Meta Ads, бриф компании и цифры кабинета. Отвечает на вопросы, предлагает действия.</span></p></div>
+    <div class="card hov tone-m rv"><div class="ic">🧑‍💻</div><h3><span class="uz">Claude (dasturchi)</span><span class="ru">Claude (разработчик)</span></h3>
+      <p><span class="uz">Botda /claude buyrug'i. Murakkab savollar, yangi funksiyalar, xatolar — agentni yaratgan Claude'ga to'g'ridan-to'g'ri.</span><span class="ru">Команда /claude в боте. Сложные вопросы, новые функции, ошибки — напрямую Claude, который собрал агента.</span></p></div>
+  </div>
+  <div class="note info rv"><span>💡</span><span><span class="uz">Asosiy g'oya: tizim reklamaning 70–80% ishini o'zi qiladi — kuzatadi, ogohlantiradi, pul ketayotgan e'lonni to'xtatadi, tavsiya beradi. Pulga oid muhim qarorlarni esa odam tasdiqlaydi.</span><span class="ru">Главная идея: система делает 70–80% работы с рекламой сама — следит, предупреждает, останавливает сливающие объявления, советует. А важные денежные решения подтверждает человек.</span></span></div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section class="ch" id="c2">
+  <div class="ch-h rv"><span class="ch-n">02</span><h2><span class="uz">5 daqiqada boshlash</span><span class="ru">Старт за 5 минут</span></h2></div>
+  <div class="steps" style="margin-top:14px">
+    <div class="step rv"><div><h3><span class="uz">Botni oching</span><span class="ru">Откройте бота</span></h3><p><span class="uz">Telegramda <b>@complexadsagent_bot</b> ni toping va <b>/start</b> bosing.</span><span class="ru">Найдите в Telegram <b>@complexadsagent_bot</b> и нажмите <b>/start</b>.</span></p></div></div>
+    <div class="step rv"><div><h3><span class="uz">Kirishni oling</span><span class="ru">Получите доступ</span></h3><p><span class="uz">Bot yopiq — faqat jamoa uchun. Begona odam yozsa, adminlarga (Damir, Muhammadbobur) «✅ Впустить» tugmasi keladi. Admin bosgach, bot sizga «Kirish ochildi» deb yozadi.</span><span class="ru">Бот закрытый — только для команды. Если пишет новый человек, админам (Дамир, Мухаммадбобур) приходит кнопка «✅ Впустить». Админ нажал — бот пишет вам «Доступ открыт».</span></p></div></div>
+    <div class="step rv"><div><h3><span class="uz">Tilni tanlang</span><span class="ru">Выберите язык</span></h3><p><span class="uz">🇺🇿 yoki 🇷🇺. Bot ismingizni Telegramdan oladi va buyruqlar menyusini ko'rsatadi. Tilni keyin /lang bilan o'zgartirish mumkin.</span><span class="ru">🇺🇿 или 🇷🇺. Бот возьмёт имя из Telegram и покажет меню команд. Язык можно сменить потом командой /lang.</span></p></div></div>
+    <div class="step rv"><div><h3><span class="uz">Dashboardni oching</span><span class="ru">Откройте дашборд</span></h3><p><span class="uz">Xabar yozish maydonining chap tomonidagi <b>«📊»</b> tugmasi. Telegram ichida parolsiz ochiladi. Pastda uchta bo'lim: <b>Hisobot · Kreativlar · Chat</b>.</span><span class="ru">Кнопка <b>«📊»</b> слева от поля ввода сообщения. Внутри Telegram открывается без пароля. Внизу три вкладки: <b>Отчёт · Креативы · Чат</b>.</span></p></div></div>
+  </div>
+  <div class="note ok rv"><span>✅</span><span><span class="uz">Tayyor. Shu daqiqadan boshlab yangi lidlar, ertalabki hisobot va ogohlantirishlar sizga ham keladi.</span><span class="ru">Готово. С этой минуты новые заявки, утренний отчёт и тревоги приходят и вам.</span></span></div>
+</section>
+
+<!-- ============ 03 ============ -->
+<section class="ch" id="c3">
+  <div class="ch-h rv"><span class="ch-n">03</span><h2><span class="uz">Telegram-bot</span><span class="ru">Telegram-бот</span></h2></div>
+  <p class="sub rv"><span class="uz">Bot ikki ish qiladi: o'zi xabar beradi va buyruqlarga javob beradi.</span><span class="ru">Бот делает две вещи: сам сообщает о важном и отвечает на команды.</span></p>
+  <div class="grid g2" style="margin-top:16px;align-items:start">
+    <div class="rv">
+      <h3 style="margin-bottom:10px"><span class="uz">O'zi nima yuboradi</span><span class="ru">Что присылает сам</span></h3>
+      <div class="tg">
+        <div class="b in">🔥 <b>Yangi lid · Новый лид</b> #42
+👤 Aziz Karimov
+📞 +998 90 123 45 67
+🎯 Sotuv bo'limi · 01_sotuv-bolimi
+• Sotuv bo'limingizda nechta menejer bor?: <b>3–5</b>
+
+⏱ Tez qo'ng'iroq qiling — 5 daqiqa ichida qo'ng'iroq konversiyani bir necha barobar oshiradi.<small>10:14</small></div>
+        <div class="b in">📊 <b><span class="uz">Ertalabki hisobot</span><span class="ru">Утренний отчёт</span></b> · 09:00
+<span class="uz">Kecha: $14.80 · 6 ariza · CPL $2.47
+🏆 01_sotuv-bolimi — $1.82
+⚠️ 03_klinika — 48 soat kutamiz…</span><span class="ru">Вчера: $14.80 · 6 заявок · CPL $2.47
+🏆 01_sotuv-bolimi — $1.82
+⚠️ 03_klinika — ждём 48 часов…</span><small>09:00</small></div>
+        <div class="b in">🚨 <b><span class="uz">KRITIK — akkauntda muammo!</span><span class="ru">КРИТИЧНО — проблема с аккаунтом!</span></b>
+<span class="uz">Holat: qarzdorlik. Reklama ko'rsatilmayapti.</span><span class="ru">Статус: задолженность. Реклама не откручивается.</span><small>14:30</small></div>
+      </div>
+    </div>
+    <div class="rv">
+      <h3 style="margin-bottom:10px"><span class="uz">Avtomatik xabarlar</span><span class="ru">Автоматические сообщения</span></h3>
+      <table class="tbl">
+        <tr><td>🔥</td><td><span class="uz"><b>Yangi lid</b> — har 2 daqiqada formalardan olinadi: ism, telefon, javoblar, qaysi kreativdan.</span><span class="ru"><b>Новая заявка</b> — забирается из форм каждые 2 минуты: имя, телефон, ответы, с какого креатива.</span></td></tr>
+        <tr><td>09:00</td><td><span class="uz"><b>Ertalabki hisobot</b> — kecha nima bo'ldi, eng yaxshi va eng yomon kreativ, bitta asosiy tavsiya.</span><span class="ru"><b>Утренний отчёт</b> — что было вчера, лучший и худший креатив, одна главная рекомендация.</span></td></tr>
+        <tr><td>🚨</td><td><span class="uz"><b>To'lov muammosi</b> — har 30 daqiqada kabinet holati tekshiriladi. Qarz yoki bloklanish bo'lsa — darhol hammaga.</span><span class="ru"><b>Проблема с оплатой</b> — каждые 30 минут проверяется статус кабинета. Долг или блокировка — сразу всем.</span></td></tr>
+        <tr><td>⚠️</td><td><span class="uz"><b>Kam sarf</b> — 12:00–21:00 oralig'ida kunlik byudjetning 10% dan kami sarflangan bo'lsa: reklama «aylanmayapti».</span><span class="ru"><b>Низкий расход</b> — если с 12:00 до 21:00 потрачено меньше 10% бюджета: реклама «не крутится».</span></td></tr>
+        <tr><td>⛔️</td><td><span class="uz"><b>Avtostop</b> — pul ketayotgan e'lon to'xtatildi (07-bo'lim).</span><span class="ru"><b>Автостоп</b> — сливающее объявление остановлено (глава 07).</span></td></tr>
+      </table>
+    </div>
+  </div>
+  <h3 class="rv" style="margin:26px 0 10px"><span class="uz">Buyruqlar</span><span class="ru">Команды</span></h3>
+  <table class="tbl rv">
+    <tr><td>/check</td><td><span class="uz">Hozirgi holat: akkaunt faolmi, bugun qancha sarflandi, nechta lid.</span><span class="ru">Состояние сейчас: активен ли кабинет, сколько потрачено сегодня, сколько заявок.</span></td></tr>
+    <tr><td>/report</td><td><span class="uz">Kechagi hisobot AI tahlili bilan.</span><span class="ru">Отчёт за вчера с AI-разбором.</span></td></tr>
+    <tr><td>/actions</td><td><span class="uz">Hozir nima qilish kerak — raqamlar bilan tavsiyalar.</span><span class="ru">Что делать сейчас — рекомендации с цифрами.</span></td></tr>
+    <tr><td>/forecast</td><td><span class="uz">Oy oxirigacha prognoz: lidlar, byudjet, CPL.</span><span class="ru">Прогноз до конца месяца: заявки, бюджет, CPL.</span></td></tr>
+    <tr><td>/topkilla</td><td><span class="uz">Eng yaxshi e'lonlar va to'xtatishga nomzodlar.</span><span class="ru">Лучшие объявления и кандидаты на паузу.</span></td></tr>
+    <tr><td>/insights</td><td><span class="uz">7 kunlik kuzatuvlar.</span><span class="ru">Наблюдения за 7 дней.</span></td></tr>
+    <tr><td>/claude</td><td><span class="uz">Claude'ga yozish — agent dasturchisiga (06-bo'lim oxiri).</span><span class="ru">Написать Claude — разработчику агента (конец главы 06).</span></td></tr>
+    <tr><td>/team</td><td><span class="uz">Xodimlar: kimda kirish bor. Admin bu yerda odamni olib tashlaydi.</span><span class="ru">Сотрудники: у кого есть доступ. Админ здесь же убирает человека.</span></td></tr>
+    <tr><td>/lang · /reset</td><td><span class="uz">Tilni o'zgartirish · qaytadan boshlash.</span><span class="ru">Сменить язык · начать заново.</span></td></tr>
+  </table>
+  <div class="note info rv"><span>📭</span><span><span class="uz">Reklama ishga tushmaguncha /actions, /forecast va /report «ma'lumot yo'q» deydi — bu xato emas.</span><span class="ru">Пока реклама не запущена, /actions, /forecast и /report отвечают «данных нет» — это не ошибка.</span></span></div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section class="ch" id="c4">
+  <div class="ch-h rv"><span class="ch-n">04</span><h2><span class="uz">Dashboard: Hisobot</span><span class="ru">Дашборд: Отчёт</span></h2></div>
+  <p class="sub rv"><span class="uz">Har bir blok bitta savolga javob beradi va harakatga olib keladi. «Bezak uchun» blok yo'q.</span><span class="ru">Каждый блок отвечает на один вопрос и ведёт к действию. Блоков «для красоты» нет.</span></p>
+
+  <div class="note warn rv"><span>🧪</span><span><span class="uz"><b>«Namuna» rejimi.</b> Yuqoridagi to'q sariq tugma dashboardni namuna raqamlar bilan to'ldiradi — reklama boshlanmasdan qanday ko'rinishini ko'rish uchun. Ekranda chiziqli ogohlantirish chiqadi. Haqiqiy qaror uchun uni o'chiring.</span><span class="ru"><b>Режим «Пример».</b> Оранжевый переключатель вверху наполняет дашборд демонстрационными цифрами — чтобы увидеть, как он будет выглядеть, до запуска рекламы. На экране появляется полосатая плашка. Для настоящих решений выключайте его.</span></span></div>
+
+  <div class="shot rv"><div class="ph"><img src="img/m-top.png" alt=""></div><div>
+    <span class="tag">Hisobot · 1</span><h3 style="margin-top:8px"><span class="uz">Asosiy raqamlar va qo'ng'iroq tezligi</span><span class="ru">Главные цифры и скорость звонка</span></h3>
+    <ul class="card" style="list-style:none;padding:16px 20px">
+      <li>📈 <span class="uz"><b>Oylik arizalar · uchrashuvlar · shartnomalar</b> — o'tgan oyga nisbatan o'sish (+22%) yoki pasayish.</span><span class="ru"><b>Заявки · встречи · договоры за месяц</b> — рост (+22%) или падение к прошлому месяцу.</span></li>
+      <li>⏱ <span class="uz"><b>Birinchi qo'ng'iroq tezligi</b> — arizadan qo'ng'iroqqacha mediana. Maqsad — 1 soatdan kam. «Sekin» chiqsa — muammo reklamada emas, qayta ishlashda.</span><span class="ru"><b>Скорость первого звонка</b> — медиана от заявки до звонка. Цель — меньше часа. «Медленно» — проблема не в рекламе, а в обработке.</span></li>
+      <li>🟠 <span class="uz"><b>Ariza narxi (CPL)</b> — rejaga nisbatan ($2 gacha).</span><span class="ru"><b>Цена заявки (CPL)</b> — против плана (до $2).</span></li>
+      <li>📝 <span class="uz"><b>Agent qaydlari</b> — avtostoplar, yangi kreativlar va asosiy maslahat.</span><span class="ru"><b>Заметки агента</b> — автостопы, новые креативы и главный совет.</span></li>
+    </ul></div></div>
+
+  <div class="shot rev rv"><div class="ph"><img src="img/m-heat.png" alt=""></div><div>
+    <span class="tag">Hisobot · 2</span><h3 style="margin-top:8px"><span class="uz">Arizalar qachon keladi</span><span class="ru">Когда приходят заявки</span></h3>
+    <p><span class="uz">Hafta kunlari × soatlar. To'q rang — arizalar ko'p. Pastda: <b>cho'qqi</b> (menejerlar albatta telefonda bo'lishi kerak) va <b>tungi arizalar ulushi</b> — ular ertalabgacha qo'ng'iroq kutadi. Tungi ulush yuqori bo'lsa — chat tugmasi orqali agentdan tungi ko'rsatishlarni so'rang.</span><span class="ru">Дни недели × часы. Тёмный цвет — много заявок. Внизу: <b>пик</b> (менеджеры обязательно на телефоне) и <b>доля ночных заявок</b> — они ждут звонка до утра. Если ночная доля высокая — спросите агента про ночные показы кнопкой чата.</span></p></div></div>
+
+  <div class="shot rv"><div class="ph"><img src="img/m-funnel.png" alt=""></div><div>
+    <span class="tag">Hisobot · 3</span><h3 style="margin-top:8px"><span class="uz">Voronka: lid qayerda yo'qolyapti</span><span class="ru">Воронка: где теряются заявки</span></h3>
+    <p><span class="uz">Ariza → Qo'ng'iroq → Uchrashuv → Taklif → Shartnoma → To'lov. Har bir qadam <b>me'yor</b> bilan solishtiriladi (masalan, qo'ng'iroqdan uchrashuvga — 30%). Qizil — me'yordan past.</span><span class="ru">Заявка → Звонок → Встреча → КП → Договор → Оплата. Каждый шаг сравнивается с <b>нормой</b> (например, от звонка до встречи — 30%). Красный — ниже нормы.</span></p>
+    <p><span class="uz"><b>Asosiy yo'qotish</b> to'q sariq bilan belgilanadi — u qancha <b>shartnoma</b> yo'qotayotganiga qarab tanlanadi. «Nega va nima qilish kerak?» tugmasi raqamlarni agentga yuboradi.</span><span class="ru"><b>Главная утечка</b> подсвечена оранжевым — выбирается по тому, сколько <b>договоров</b> она стоит. Кнопка «Почему и что делать?» отправляет цифры агенту.</span></p></div></div>
+
+  <div class="shot rev rv"><div class="ph"><img src="img/m-sim.png" alt=""></div><div>
+    <span class="tag">Hisobot · 4</span><h3 style="margin-top:8px"><span class="uz">Byudjet simulyatori</span><span class="ru">Симулятор бюджета</span></h3>
+    <p><span class="uz">Slayderni $5 dan $40 gacha suring — oylik arizalar, uchrashuvlar, shartnomalar, tushum va shartnoma narxi darhol qayta hisoblanadi. $15 dan yuqori zona chiziqli — bu <b>shift</b>, undan yuqori faqat asoschi roziligi bilan. Simulyator kabinetda hech narsani o'zgartirmaydi.</span><span class="ru">Тяните слайдер от $5 до $40 — заявки, встречи, договоры, выручка и цена договора за месяц пересчитываются сразу. Зона выше $15 заштрихована — это <b>потолок</b>, выше только с согласия основателя. Симулятор ничего не меняет в кабинете.</span></p>
+    <div class="note warn"><span>⚠️</span><span><span class="uz">Reklamaning birinchi 1–2 haftasida prognoz taxminlarga asoslanadi (tagida yozilgan). Uni va'da sifatida qabul qilmang.</span><span class="ru">Первые 1–2 недели рекламы прогноз строится на допущениях (подписаны под слайдером). Не воспринимайте его как обещание.</span></span></div></div></div>
+
+  <div class="shot rv"><div class="ph"><img src="img/m-rings.png" alt=""></div><div>
+    <span class="tag">Hisobot · 5</span><h3 style="margin-top:8px"><span class="uz">Oy rejasi va boshqalar</span><span class="ru">План месяца и остальное</span></h3>
+    <ul class="card" style="list-style:none;padding:16px 20px">
+      <li>⭕ <span class="uz"><b>Halqalar</b> — shartnoma, uchrashuv va arizalar rejaning qancha qismi bajarildi (maqsad: oyiga 10 shartnoma, 120 mln).</span><span class="ru"><b>Кольца</b> — сколько договоров, встреч и заявок сделано от плана (цель: 10 договоров и 120 млн в месяц).</span></li>
+      <li>📅 <span class="uz"><b>Uchrashuvlar jadvali</b> — shu haftaga Bitrix24 dagi uchrashuvlar.</span><span class="ru"><b>Расписание встреч</b> — встречи этой недели из Bitrix24.</span></li>
+      <li>📉 <span class="uz"><b>Samaradorlik grafigi</b> — kunlar bo'yicha arizalar va CPL.</span><span class="ru"><b>График эффективности</b> — заявки и CPL по дням.</span></li>
+      <li>🏅 <span class="uz"><b>Menejerlar reytingi</b> — kim qancha uchrashuv va shartnoma qildi (Bitrix24 da lidlar menejerlarga taqsimlanganda ishlaydi).</span><span class="ru"><b>Рейтинг менеджеров</b> — у кого сколько встреч и договоров (работает, когда лиды распределяются на менеджеров в Bitrix24).</span></li>
+    </ul></div></div>
+  <div class="wide rv" style="margin-top:20px"><img src="img/d-top.png" alt=""></div>
+  <p class="sub rv" style="text-align:center;margin:10px auto 0"><span class="uz">Kompyuterda dashboard bitta ekranda ko'rinadi.</span><span class="ru">На компьютере дашборд виден одним экраном.</span></p>
+</section>
+
+<!-- ============ 05 ============ -->
+<section class="ch" id="c5">
+  <div class="ch-h rv"><span class="ch-n">05</span><h2><span class="uz">Kreativlar bazasi</span><span class="ru">База креативов</span></h2></div>
+  <div class="shot rv"><div class="ph"><img src="img/m-creatives.png" alt=""></div><div>
+    <p><span class="uz">Kabinetdagi barcha videolar va yuklangan yangilari — bitta joyda, ilova ichida o'ynaydi. Har bir kreativ uchun: sarf, lidlar, CPL, musor, <b>uchrashuv narxi</b> va <b>shartnoma narxi</b>. Kreativni lid narxi bo'yicha emas, shartnoma narxi bo'yicha baholang — arzon lid ko'pincha arzon mijoz emas.</span><span class="ru">Все видео кабинета и новые загруженные — в одном месте, проигрываются прямо в приложении. У каждого: расход, заявки, CPL, мусор, <b>цена встречи</b> и <b>цена договора</b>. Оценивайте креатив по цене договора, а не заявки — дешёвая заявка часто не дешёвый клиент.</span></p>
+    <div class="grid g3" style="margin-top:12px">
+      <div class="card tone-m"><b>🏆 <span class="uz">Kengaytirish</span><span class="ru">Масштабировать</span></b><p><span class="uz">Shartnoma eng arzon kreativ.</span><span class="ru">Креатив с самым дешёвым договором.</span></p></div>
+      <div class="card tone-p"><b>⚠️ <span class="uz">Pul ketyapti</span><span class="ru">Сливает</span></b><p><span class="uz">Sarflangan, lekin shartnoma yo'q.</span><span class="ru">Тратит, а договоров нет.</span></p></div>
+      <div class="card tone-l"><b>✨ <span class="uz">Testni kutmoqda</span><span class="ru">Ждут теста</span></b><p><span class="uz">Yuklangan, reklamada emas.</span><span class="ru">Загружены, но не в рекламе.</span></p></div>
+    </div></div></div>
+  <h3 class="rv" style="margin:22px 0 10px"><span class="uz">Yangi kreativni qanday yuklash</span><span class="ru">Как загрузить новый креатив</span></h3>
+  <div class="steps">
+    <div class="step rv"><div><h3><span class="uz">Kreativlar → «Yangi kreativ yuklash»</span><span class="ru">Креативы → «Загрузить креатив»</span></h3><p><span class="uz">Videoni tanlang, yo'nalishni (Sotuv bo'limi / Klinika) va qisqa izoh yozing: kim uchun, qaysi xuk, nimani sinaymiz.</span><span class="ru">Выберите видео, направление (Отдел продаж / Клиники) и короткую заметку: для кого, какой хук, что проверяем.</span></p></div></div>
+    <div class="step rv"><div><h3><span class="uz">Hajm cheklanmagan</span><span class="ru">Размер не ограничен</span></h3><p><span class="uz">100–250 MB li videolar ham bo'laklab yuklanadi, progress ko'rinadi, internet uzilsa — joyidan davom etadi. Video to'g'ridan-to'g'ri reklama kabinetiga tushadi.</span><span class="ru">Ролики по 100–250 МБ грузятся частями, виден прогресс, при обрыве связи — продолжится с места. Видео попадает сразу в рекламный кабинет.</span></p></div></div>
+    <div class="step rv"><div><h3><span class="uz">«Taklif qilish» → chat</span><span class="ru">«Предложить запуск» → чат</span></h3><p><span class="uz">Kartochkadagi tugma agentga savol ochadi: qaysi guruhga va qanday test qilish. Reklamaga qo'yish — tasdiqlashdan keyin.</span><span class="ru">Кнопка на карточке открывает вопрос агенту: в какую группу и как тестировать. В рекламу — после подтверждения.</span></p></div></div>
+  </div>
+  <div class="note info rv"><span>📲</span><span><span class="uz">20 MB gacha bo'lgan videoni botga to'g'ridan-to'g'ri yuborsa ham bo'ladi — u bazaga tushadi. Kattaroq bo'lsa, bot dashboarddagi yuklash bo'limiga tugma yuboradi (Telegram botlarga 20 MB dan katta fayl bermaydi).</span><span class="ru">Видео до 20 МБ можно прислать прямо в бота — оно попадёт в базу. Если больше, бот пришлёт кнопку на загрузку в дашборде (Telegram не отдаёт ботам файлы больше 20 МБ).</span></span></div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section class="ch" id="c6">
+  <div class="ch-h rv"><span class="ch-n">06</span><h2><span class="uz">AI-targetolog bilan chat</span><span class="ru">Чат с AI-таргетологом</span></h2></div>
+  <div class="shot rev rv"><div class="ph"><img src="img/m-chat.png" alt=""></div><div>
+    <h3><span class="uz">U nimani biladi</span><span class="ru">Что он знает</span></h3>
+    <ul class="card" style="list-style:none;padding:16px 20px">
+      <li>📚 <span class="uz">Meta Ads 2026 bilimlar bazasi (31 manba), Hormozi iqtisodiyoti, targetolog bazasi.</span><span class="ru">База знаний Meta Ads 2026 (31 источник), экономика Hormozi, база таргетолога.</span></li>
+      <li>🏢 <span class="uz">Complex briefi: xizmatlar, o'rtacha chek 14,4 mln, maqsad — oyiga 10 shartnoma, e'tirozlar, takliflar.</span><span class="ru">Бриф Complex: услуги, средний чек 14,4 млн, цель — 10 договоров в месяц, возражения, офферы.</span></li>
+      <li>📊 <span class="uz">Jonli raqamlar: kabinet, Bitrix24 dagi lidlar, kreativlar, avtostoplar.</span><span class="ru">Живые цифры: кабинет, лиды в Bitrix24, креативы, автостопы.</span></li>
+    </ul>
+    <h3 style="margin-top:14px"><span class="uz">U nima qila oladi</span><span class="ru">Что он может</span></h3>
+    <p><span class="uz">Javob beradi, tahlil qiladi, matn yozadi va <b>harakat taklif qiladi</b> — tugma bilan. O'zi kabinetda <b>hech narsani o'zgartirmaydi</b>: e'lonni to'xtatish yoki byudjetni o'zgartirish faqat siz «Tasdiqlash» ni bosganingizdan keyin. Yozishmani butun jamoa ko'radi.</span><span class="ru">Отвечает, анализирует, пишет тексты и <b>предлагает действия</b> — кнопкой. Сам в кабинете <b>ничего не меняет</b>: пауза объявления или изменение бюджета — только после вашего «Подтвердить». Переписку видит вся команда.</span></p></div></div>
+
+  <h3 class="rv" style="margin:24px 0 10px"><span class="uz">Nimalarni so'rash mumkin (bosing — nusxa olinadi)</span><span class="ru">Что можно спрашивать (нажмите — скопируется)</span></h3>
+  <div class="chips rv" id="qs">
+    <button class="chip uz">Kecha reklama qanday ishladi?</button><button class="chip ru">Как вчера отработала реклама?</button>
+    <button class="chip uz">Qaysi kreativ eng arzon shartnoma beryapti?</button><button class="chip ru">Какой креатив даёт самый дешёвый договор?</button>
+    <button class="chip uz">Nega bugun lidlar qimmat?</button><button class="chip ru">Почему сегодня заявки дорогие?</button>
+    <button class="chip uz">03_klinika kreativini to'xtatish kerakmi?</button><button class="chip ru">Ставить ли 03_klinika на паузу?</button>
+    <button class="chip uz">Voronkada qayerda eng ko'p yo'qotyapmiz?</button><button class="chip ru">Где в воронке мы теряем больше всего?</button>
+    <button class="chip uz">Klinikalar uchun 3 ta yangi xuk yozib ber</button><button class="chip ru">Напиши 3 новых хука для клиник</button>
+    <button class="chip uz">Formaga qanday savol qo'shsak, musor kamayadi?</button><button class="chip ru">Какой вопрос добавить в форму, чтобы было меньше мусора?</button>
+    <button class="chip uz">Byudjetni $20 ga oshirsak nima bo'ladi?</button><button class="chip ru">Что будет, если поднять бюджет до $20?</button>
+    <button class="chip uz">Menejerlar lidlarga qanchalik tez qo'ng'iroq qilyapti?</button><button class="chip ru">Как быстро менеджеры звонят по заявкам?</button>
+    <button class="chip uz">Qaysi soatlarda menejer telefonda bo'lishi kerak?</button><button class="chip ru">В какие часы менеджер должен быть на телефоне?</button>
+    <button class="chip uz">Oy oxirigacha 10 ta shartnomaga yetamizmi?</button><button class="chip ru">Успеем ли к 10 договорам к концу месяца?</button>
+    <button class="chip uz">«Qimmat» degan mijozga nima deyish kerak?</button><button class="chip ru">Что отвечать клиенту, который говорит «дорого»?</button>
+    <button class="chip uz">Yangi videoni qaysi guruhga qo'yamiz?</button><button class="chip ru">В какую группу поставить новое видео?</button>
+    <button class="chip uz">Bitta shartnoma bizga reklamada qancha turadi?</button><button class="chip ru">Сколько нам стоит один договор в рекламе?</button>
+  </div>
+
+  <h3 class="rv" style="margin:28px 0 10px"><span class="uz">Misol: «Kuniga $1000 qo'yamiz»</span><span class="ru">Пример: «Давай $1000 в день»</span></h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="tg rv">
+      <div class="b out"><span class="uz">Lidlar arzon ekan, byudjetni kuniga $1000 ga oshiraylik!</span><span class="ru">Заявки дешёвые, давай поднимем бюджет до $1000 в день!</span><small>11:02</small></div>
+      <div class="b in"><span class="uz"><b>Yo'q, $1000 ni taklif qilmayman.</b> Raqamlarda:
+• $1000/kun ≈ oyiga $30 000 — briefdagi byudjetdan 60 baravar ko'p.
+• Shift $15/kun, uni faqat asoschi o'zgartiradi.
+• Keskin oshirish o'rganish bosqichini buzadi — CPL byudjetdan tezroq o'sadi.
+• 3 ta lid allaqachon 15 daqiqadan beri qo'ng'iroq kutyapti — jamoa bunday oqimni ko'tarmaydi.
+
+<b>O'rniga:</b> $15 da 3–4 ta kreativ bilan test, 3–5 kunda raqamlar bo'yicha qaror. Bu @themuhammadbobur qarori.</span><span class="ru"><b>Нет, $1000 в день не предлагаю.</b> На цифрах:
+• $1000/день ≈ $30 000 в месяц — в 60 раз больше бюджета из брифа.
+• Потолок $15/день, менять его может только основатель.
+• Резкий рост сбрасывает обучение — CPL растёт быстрее бюджета.
+• 3 заявки уже ждут звонка дольше 15 минут — команда не обработает такой поток.
+
+<b>Вместо этого:</b> тест на $15 с 3–4 креативами, решение по цифрам через 3–5 дней. Это решение @themuhammadbobur.</span><small>11:02</small></div>
+    </div>
+    <div class="rv">
+      <div class="card"><h3><span class="uz">Nima uchun bunday javob</span><span class="ru">Почему такой ответ</span></h3>
+        <p><span class="uz">Agent itoatkorlikdan ko'ra mijoz pulini muhimroq deb hisoblaydi. Yomon g'oyaga «xo'p» demaydi — raqamlar bilan tushuntiradi va xavfsiz variant taklif qiladi. Hatto kimdir tasdiqlash tugmasini bossa ham, server $15 dan yuqori yoki bir kunda 30% dan ortiq oshirishni rad etadi.</span><span class="ru">Для агента деньги клиента важнее послушности. На плохую идею он не говорит «хорошо» — объясняет на цифрах и предлагает безопасный вариант. Даже если кто-то нажмёт кнопку подтверждения, сервер отклонит бюджет выше $15 или рост больше 30% за сутки.</span></p></div>
+      <div class="card ember" style="margin-top:12px"><h3><span class="uz">Haqiqiy javob</span><span class="ru">Это реальный ответ</span></h3><p><span class="uz">Yuqoridagi javob — agentni tekshirishda olingan, o'ylab topilmagan.</span><span class="ru">Ответ выше получен при проверке агента, а не придуман.</span></p></div>
+    </div>
+  </div>
+
+  <h3 class="rv" style="margin:28px 0 10px">/claude — <span class="uz">dasturchiga savol</span><span class="ru">вопрос разработчику</span></h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="card rv"><p><span class="uz">AI-targetolog — reklama haqidagi savollar uchun. <b>Agentning o'zi</b> haqida savol — yangi funksiya kerak, nimadir ishlamayapti, dashboardga blok qo'shish — botda <b>/claude</b> va savolni yozing. U agentni yaratgan Claude'ga keladi, javob shu botga qaytadi.</span><span class="ru">AI-таргетолог — для вопросов о рекламе. Вопрос <b>о самом агенте</b> — нужна новая функция, что-то не работает, добавить блок в дашборд — пишите в боте <b>/claude</b> и вопрос. Он придёт Claude, который собрал агента, ответ вернётся в этот же бот.</span></p>
+      <p style="margin:0"><span class="uz">⚠️ Javob darhol kelmasligi mumkin: Claude Damirning ishchi kompyuteri yoqiq bo'lganda javob beradi. Savol yo'qolmaydi — navbatda kutadi.</span><span class="ru">⚠️ Ответ может прийти не сразу: Claude отвечает, когда включён рабочий компьютер Дамира. Вопрос не потеряется — ждёт в очереди.</span></p></div>
+    <div class="tg rv">
+      <div class="b out">/claude <span class="uz">Dashboardga menejerlar bo'yicha haftalik hisobot qo'shsa bo'ladimi?</span><span class="ru">Можно добавить в дашборд недельный отчёт по менеджерам?</span><small>15:40</small></div>
+      <div class="b in">✉️ <span class="uz">Savol Claude'ga yuborildi — javob shu yerga keladi.</span><span class="ru">Вопрос передан Claude — ответ придёт сюда.</span><small>15:40</small></div>
+      <div class="b in">🧑‍💻 Claude:
+<span class="uz">Ha, qo'shaman: har dushanba 9:00 da…</span><span class="ru">Да, добавлю: каждый понедельник в 9:00…</span><small>15:52</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section class="ch" id="c7">
+  <div class="ch-h rv"><span class="ch-n">07</span><h2><span class="uz">Chegaralar va xavfsizlik</span><span class="ru">Границы и безопасность</span></h2></div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card hov rv"><div class="ic">💰</div><h3><span class="uz">Shift — $15/kun</span><span class="ru">Потолок — $15/день</span></h3><p><span class="uz">Briefdagi oyiga ~6 mln so'm. Undan yuqori — faqat Muhammadbobur «ha» degandan keyin, shiftni Damir o'zgartiradi.</span><span class="ru">≈ 6 млн сум в месяц по брифу. Выше — только после «да» Мухаммадбобура, потолок меняет Дамир.</span></p></div>
+    <div class="card hov rv"><div class="ic">📶</div><h3><span class="uz">Qadam — 30% gacha</span><span class="ru">Шаг — до 30%</span></h3><p><span class="uz">Byudjet kuniga 30% dan ko'p o'zgarmaydi, guruhga kuniga bitta o'zgarish. Aks holda Facebook qayta o'rganadi va CPL oshadi.</span><span class="ru">Бюджет меняется не больше чем на 30% в сутки и не чаще раза в день на группу. Иначе Facebook переобучается и CPL растёт.</span></p></div>
+    <div class="card hov rv"><div class="ic">🧑‍⚖️</div><h3><span class="uz">Kuchli o'zgarishlar</span><span class="ru">Сильные изменения</span></h3><p><span class="uz">Yangi kampaniya, taklif, geo yoki auditoriyani o'zgartirish — faqat asoschi roziligi bilan.</span><span class="ru">Новая кампания, смена оффера, гео или аудитории — только с согласия основателя.</span></p></div>
+  </div>
+  <h3 class="rv" style="margin:24px 0 10px">⛔️ <span class="uz">Avtostop qoidalari (har 30 daqiqada)</span><span class="ru">Правила автостопа (каждые 30 минут)</span></h3>
+  <table class="tbl rv">
+    <tr><td>$6+, 0</td><td><span class="uz">E'lon maqsadli CPL ning 3 baravari ($6) sarflab, birorta ariza bermagan bo'lsa — to'xtatiladi.</span><span class="ru">Объявление потратило 3 целевых CPL ($6) и не дало ни одной заявки — пауза.</span></td></tr>
+    <tr><td>$12+, CPL &gt; $6</td><td><span class="uz">$12 sarfdan keyin ariza $6 dan qimmat — to'xtatiladi.</span><span class="ru">После $12 расхода заявка дороже $6 — пауза.</span></td></tr>
+    <tr><td><span class="uz">oxirgisi</span><span class="ru">последнее</span></td><td><span class="uz">Guruhdagi oxirgi faol e'lonni agent o'zi to'xtatmaydi (guruh to'liq to'xtab qoladi) — odamlardan so'raydi.</span><span class="ru">Последнее активное объявление в группе агент сам не выключает (встанет вся группа) — спрашивает людей.</span></td></tr>
+  </table>
+  <div class="note ok rv"><span>🔒</span><span><span class="uz">Bitrix24 faqat o'qish uchun ulangan: dashboard va agent CRM da hech narsani yozmaydi, o'zgartirmaydi va o'chirmaydi — bu kod darajasida taqiqlangan.</span><span class="ru">Bitrix24 подключён только на чтение: дашборд и агент ничего не пишут, не меняют и не удаляют в CRM — это запрещено на уровне кода.</span></span></div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section class="ch" id="c8">
+  <div class="ch-h rv"><span class="ch-n">08</span><h2><span class="uz">Kritik vaziyatlar</span><span class="ru">Критические ситуации</span></h2></div>
+  <p class="sub rv"><span class="uz">Nima bo'lganda bot xabar beradi va siz nima qilasiz.</span><span class="ru">Когда бот сообщит и что делать вам.</span></p>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card hov rv" style="border-left:4px solid var(--bad)"><h3>🚨 <span class="uz">Reklama to'lov tufayli to'xtadi</span><span class="ru">Реклама встала из-за оплаты</span></h3>
+      <p><b><span class="uz">Bot:</span><span class="ru">Бот:</span></b> <span class="uz">«KRITIK — akkauntda muammo», 30 daqiqa ichida.</span><span class="ru">«КРИТИЧНО — проблема с аккаунтом», в течение 30 минут.</span></p>
+      <p><b><span class="uz">Siz:</span><span class="ru">Вы:</span></b> <span class="uz">Business Manager → Billing → qarzni to'lang. E'lonlar «faol» ko'rinishi mumkin, lekin sarf $0 bo'ladi — xabarga ishoning.</span><span class="ru">Business Manager → Биллинг → оплатите долг. Объявления могут выглядеть «активными», но расход $0 — верьте сообщению.</span></p></div>
+    <div class="card hov rv" style="border-left:4px solid var(--warn)"><h3>⚠️ <span class="uz">Reklama «aylanmayapti»</span><span class="ru">Реклама «не крутится»</span></h3>
+      <p><b><span class="uz">Bot:</span><span class="ru">Бот:</span></b> <span class="uz">«Kam sarf» — kunduzi byudjetning 10% dan kami.</span><span class="ru">«Низкий расход» — днём меньше 10% бюджета.</span></p>
+      <p><b><span class="uz">Siz:</span><span class="ru">Вы:</span></b> <span class="uz">/check, keyin chatda «Nega reklama aylanmayapti?» deb so'rang: moderatsiya, to'lov, auditoriya.</span><span class="ru">/check, затем спросите в чате «Почему реклама не крутится?»: модерация, оплата, аудитория.</span></p></div>
+    <div class="card hov rv" style="border-left:4px solid var(--acc)"><h3>⛔️ <span class="uz">Avtostop ishladi</span><span class="ru">Сработал автостоп</span></h3>
+      <p><b><span class="uz">Bot:</span><span class="ru">Бот:</span></b> <span class="uz">qaysi e'lon, qancha sarflangan, sabab.</span><span class="ru">какое объявление, сколько потрачено, причина.</span></p>
+      <p><b><span class="uz">Siz:</span><span class="ru">Вы:</span></b> <span class="uz">hech narsa — pul tejaldi. Qaytarmoqchi bo'lsangiz, chatda «… ni qaytar» deng va sababini muhokama qiling.</span><span class="ru">ничего — деньги сэкономлены. Хотите вернуть — напишите в чате «включи … обратно» и обсудите причину.</span></p></div>
+    <div class="card hov rv" style="border-left:4px solid var(--lav)"><h3>⏱ <span class="uz">Lidlar sovuyapti</span><span class="ru">Заявки остывают</span></h3>
+      <p><b><span class="uz">Qayerda:</span><span class="ru">Где:</span></b> <span class="uz">dashboardda «Birinchi qo'ng'iroq tezligi» — «Sekin».</span><span class="ru">в дашборде «Скорость первого звонка» — «Медленно».</span></p>
+      <p><b><span class="uz">Siz:</span><span class="ru">Вы:</span></b> <span class="uz">byudjetni emas, qo'ng'iroqni tuzating: ariza kelgan zahoti — qo'ng'iroq. 5 daqiqadagi qo'ng'iroq bir soatdagidan bir necha barobar ko'p sotadi.</span><span class="ru">чините не бюджет, а звонки: пришла заявка — сразу звонок. Звонок через 5 минут продаёт в разы лучше, чем через час.</span></p></div>
+    <div class="card hov rv" style="border-left:4px solid var(--blue)"><h3>📭 <span class="uz">Lidlar kelmayapti</span><span class="ru">Заявки не приходят</span></h3>
+      <p><b><span class="uz">Siz:</span><span class="ru">Вы:</span></b> <span class="uz">/check — sarf bormi? Sarf bor, lid yo'q — chatda tahlil so'rang. Sarf yo'q — yuqoridagi «aylanmayapti» holati.</span><span class="ru">/check — есть ли расход? Расход есть, заявок нет — попросите разбор в чате. Расхода нет — случай «не крутится» выше.</span></p></div>
+    <div class="card hov rv" style="border-left:4px solid var(--mint)"><h3>🔐 <span class="uz">Yangi xodim / ketgan xodim</span><span class="ru">Новый / ушедший сотрудник</span></h3>
+      <p><span class="uz">Yangi: botga /start yozadi → admin «✅ Впустить». Ketgan: admin /team → ❌ → «Ha, olib tashlash». Kirish darhol yopiladi.</span><span class="ru">Новый: пишет боту /start → админ «✅ Впустить». Ушёл: админ /team → ❌ → «Да, убрать». Доступ закрывается сразу.</span></p></div>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section class="ch" id="c9">
+  <div class="ch-h rv"><span class="ch-n">09</span><h2><span class="uz">Kundalik tartib</span><span class="ru">Распорядок работы</span></h2></div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card hov tone-p rv"><h3>☀️ <span class="uz">Har kuni ertalab · 5 daq</span><span class="ru">Каждое утро · 5 мин</span></h3><ul>
+      <li><span class="uz">09:00 hisobotni o'qing.</span><span class="ru">Прочитайте отчёт в 9:00.</span></li>
+      <li><span class="uz">Dashboard: kecha nechta ariza, qo'ng'iroq tezligi.</span><span class="ru">Дашборд: сколько заявок вчера, скорость звонка.</span></li>
+      <li><span class="uz">Kechagi barcha lidlarga qo'ng'iroq qilinganini tekshiring.</span><span class="ru">Проверьте, что всем вчерашним заявкам позвонили.</span></li></ul></div>
+    <div class="card hov tone-l rv"><h3>📅 <span class="uz">Har hafta · 20 daq</span><span class="ru">Каждую неделю · 20 мин</span></h3><ul>
+      <li><span class="uz">Kreativlar: kim eng arzon shartnoma beradi, kim pul yeydi.</span><span class="ru">Креативы: кто даёт самый дешёвый договор, кто ест деньги.</span></li>
+      <li><span class="uz">Voronka: asosiy yo'qotishni muhokama qiling.</span><span class="ru">Воронка: обсудите главную утечку.</span></li>
+      <li><span class="uz">1–2 ta yangi kreativni yuklang — test uchun.</span><span class="ru">Загрузите 1–2 новых креатива для теста.</span></li></ul></div>
+    <div class="card hov tone-b rv"><h3>🗓 <span class="uz">Har oy · 30 daq</span><span class="ru">Каждый месяц · 30 мин</span></h3><ul>
+      <li><span class="uz">Oy rejasi: halqalar, maqsadga yetdikmi.</span><span class="ru">План месяца: кольца, дошли ли до цели.</span></li>
+      <li><span class="uz">Shartnoma narxi o'rtacha chekdan past ekanini tekshiring.</span><span class="ru">Проверьте, что цена договора ниже среднего чека.</span></li>
+      <li><span class="uz">Byudjetni o'zgartirish haqida asoschi bilan qaror.</span><span class="ru">Решение с основателем о бюджете.</span></li></ul></div>
+  </div>
+  <div class="note warn rv"><span>📌</span><span><span class="uz">Bitrix24 da har bir lidni <b>aniq menejerga</b> taqsimlang va bosqichlarini yangilab boring — aks holda voronka va menejerlar reytingi bo'sh qoladi.</span><span class="ru">Распределяйте каждую заявку в Bitrix24 на <b>конкретного менеджера</b> и двигайте её по этапам — иначе воронка и рейтинг менеджеров будут пустыми.</span></span></div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="ch" id="c10">
+  <div class="ch-h rv"><span class="ch-n">10</span><h2><span class="uz">Amaliyot va «tayyorman»</span><span class="ru">Практика и «я готов»</span></h2></div>
+  <p class="sub rv"><span class="uz">Har bir topshiriqni bajaring va belgilang — progress shu qurilmada saqlanadi.</span><span class="ru">Выполните каждое задание и отметьте — прогресс сохраняется на этом устройстве.</span></p>
+  <div class="card rv" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b><span class="uz">Tayyorlik</span><span class="ru">Готовность</span></b><span id="pct" style="font:600 15px var(--m)">0%</span></div>
+    <div class="meter"><i id="bar"></i></div>
+  </div>
+  <div id="tasks" class="rv">
+    <label class="task"><input type="checkbox" data-k="t1"><span><span class="uz">Botga /start yozdim, tilni tanladim, «📊» tugmasini topdim.</span><span class="ru">Написал боту /start, выбрал язык, нашёл кнопку «📊».</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t2"><span><span class="uz">/check va /team buyruqlarini sinab ko'rdim.</span><span class="ru">Попробовал команды /check и /team.</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t3"><span><span class="uz">Dashboardda «Namuna» ni yoqdim va har bir blok nimani ko'rsatishini tushundim. Keyin o'chirdim.</span><span class="ru">Включил в дашборде «Пример», понял, что показывает каждый блок. Потом выключил.</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t4"><span><span class="uz">Voronkada asosiy yo'qotishni topdim va «Nega va nima qilish kerak?» tugmasini bosdim.</span><span class="ru">Нашёл в воронке главную утечку и нажал «Почему и что делать?».</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t5"><span><span class="uz">Simulyatorda $15 va $25 ni solishtirdim va shiftdan yuqori nima uchun ruxsat bilan ekanini tushundim.</span><span class="ru">Сравнил в симуляторе $15 и $25 и понял, почему выше потолка — только с согласия.</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t6"><span><span class="uz">Kreativlar bo'limida bitta videoni ochib ko'rdim.</span><span class="ru">Открыл и посмотрел одно видео во вкладке «Креативы».</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t7"><span><span class="uz">Chatda 3 ta savol berdim (yuqoridagi ro'yxatdan).</span><span class="ru">Задал в чате 3 вопроса (из списка выше).</span></span></label>
+    <label class="task"><input type="checkbox" data-k="t8"><span><span class="uz">Kritik vaziyatlarda nima qilishni bilaman: to'lov, kam sarf, avtostop, sovuq lidlar.</span><span class="ru">Знаю, что делать в критических ситуациях: оплата, низкий расход, автостоп, остывшие заявки.</span></span></label>
+  </div>
+  <div class="card ember rv" style="margin-top:18px;text-align:center;padding:28px">
+    <div class="kpi">🚀</div>
+    <h3 style="font-size:24px"><span class="uz">Hammasi belgilandi — siz tayyorsiz</span><span class="ru">Всё отмечено — вы готовы</span></h3>
+    <p style="margin:0"><span class="uz">Savollar bo'yicha FAQ tez orada shu sahifaga qo'shiladi. Hozircha — AI-targetolog chatda, agent haqida — /claude.</span><span class="ru">FAQ по частым вопросам скоро появится на этой странице. Пока — AI-таргетолог в чате, о самом агенте — /claude.</span></p>
+  </div>
+</section>
+</main>
+
+<footer><span class="uz">Complex Group · Ads Agent qo'llanmasi · 30.10.2026</span><span class="ru">Complex Group · руководство по Ads Agent · 30.10.2026</span></footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function store(k,v){try{v===undefined?0:localStorage.setItem(k,v)}catch(e){}}
+  function read(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  // язык
+  function setLang(l){root.setAttribute('data-lang',l);root.lang=l;store('cg-guide-lang',l);
+    document.querySelectorAll('#lang button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)})}
+  setLang(read('cg-guide-lang')||'uz');
+  document.querySelectorAll('#lang button').forEach(function(b){b.onclick=function(){setLang(b.dataset.l)}});
+  // тема
+  function setTheme(t){if(t)root.setAttribute('data-theme',t);store('cg-guide-theme',t);
+    var cur=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    document.querySelectorAll('#theme button').forEach(function(b){b.classList.toggle('on',b.dataset.t===cur)})}
+  setTheme(read('cg-guide-theme'));
+  document.querySelectorAll('#theme button').forEach(function(b){b.onclick=function(){setTheme(b.dataset.t)}});
+  // появление блоков
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.rv').forEach(function(el,i){el.style.transitionDelay=(i%4)*70+'ms';io.observe(el)});
+  // прогресс чтения
+  var prog=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.body.scrollHeight-innerHeight;prog.style.width=(h>0?scrollY/h*100:0)+'%'},{passive:true});
+  // копирование вопросов
+  document.querySelectorAll('#qs .chip').forEach(function(c){c.onclick=function(){
+    var txt=c.textContent;(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){
+      c.classList.add('copied');setTimeout(function(){c.classList.remove('copied')},1200)}).catch(function(){})}});
+  // задания
+  var boxes=document.querySelectorAll('#tasks input');
+  function upd(){var n=0;boxes.forEach(function(b){if(b.checked)n++;b.closest('.task').classList.toggle('done',b.checked)});
+    var p=Math.round(n/boxes.length*100);document.getElementById('pct').textContent=p+'%';document.getElementById('bar').style.width=p+'%'}
+  boxes.forEach(function(b){b.checked=read('cg-guide-'+b.dataset.k)==='1';b.onchange=function(){store('cg-guide-'+b.dataset.k,b.checked?'1':'0');upd()}});
+  upd();
+})();
+</script>
+</body>
+</html>
